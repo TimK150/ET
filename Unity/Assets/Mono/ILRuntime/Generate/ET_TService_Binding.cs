@@ -11,6 +11,7 @@ using ILRuntime.Runtime.Intepreter;
 using ILRuntime.Runtime.Stack;
 using ILRuntime.Reflection;
 using ILRuntime.CLR.Utils;
+using ET;
 
 namespace ILRuntime.Runtime.Generated
 {
@@ -21,12 +22,16 @@ namespace ILRuntime.Runtime.Generated
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
             Type[] args;
+#if  true
             Type type = typeof(ET.TService);
+#else
+            Type type = typeof(ET.WService);
+#endif
 
-            args = new Type[]{typeof(ET.ThreadSynchronizationContext), typeof(ET.ServiceType)};
+            args = new Type[] { typeof(ET.ThreadSynchronizationContext), typeof(ET.ServiceType) };
             method = type.GetConstructor(flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Ctor_0);
-            args = new Type[]{typeof(ET.ThreadSynchronizationContext), typeof(System.Net.IPEndPoint), typeof(ET.ServiceType)};
+            args = new Type[] { typeof(ET.ThreadSynchronizationContext), typeof(System.Net.IPEndPoint), typeof(ET.ServiceType) };
             method = type.GetConstructor(flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, Ctor_1);
 
@@ -47,8 +52,11 @@ namespace ILRuntime.Runtime.Generated
             ET.ThreadSynchronizationContext @threadSynchronizationContext = (ET.ThreadSynchronizationContext)typeof(ET.ThreadSynchronizationContext).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-
+#if  true
             var result_of_this_method = new ET.TService(@threadSynchronizationContext, @serviceType);
+#else
+            var result_of_this_method = new ET.WService(@threadSynchronizationContext/*, @serviceType*/);
+#endif
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }
@@ -70,8 +78,11 @@ namespace ILRuntime.Runtime.Generated
             ET.ThreadSynchronizationContext @threadSynchronizationContext = (ET.ThreadSynchronizationContext)typeof(ET.ThreadSynchronizationContext).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-
+#if  true
             var result_of_this_method = new ET.TService(@threadSynchronizationContext, @ipEndPoint, @serviceType);
+#else
+            var result_of_this_method = new ET.WService(@threadSynchronizationContext/*, @ipEndPoint, @serviceType*/);
+#endif
 
             return ILIntepreter.PushObject(__ret, __mStack, result_of_this_method);
         }

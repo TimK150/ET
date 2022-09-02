@@ -241,7 +241,7 @@ namespace ET
 				return;
 			}
 			SocketAsyncEventArgs e = (SocketAsyncEventArgs) o;
-
+			var ip = e.RemoteEndPoint;
 			if (e.SocketError != SocketError.Success)
 			{
 				this.OnError((int)e.SocketError);

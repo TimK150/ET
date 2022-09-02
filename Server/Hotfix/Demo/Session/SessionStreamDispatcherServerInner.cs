@@ -48,6 +48,8 @@ namespace ET
                 type = OpcodeTypeComponent.Instance.GetType(opcode);
                 message = MessageSerializeHelper.DeserializeFrom(opcode, type, memoryStream);
 
+                Console.WriteLine($"解密message: {message}");
+
                 if (message is IResponse iResponse && !(message is IActorResponse))
                 {
                     session.OnRead(opcode, iResponse);

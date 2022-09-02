@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ET
 {
     public static class SceneFactory
@@ -6,24 +8,30 @@ namespace ET
         {
             Scene zoneScene = EntitySceneFactory.CreateScene(Game.IdGenerater.GenerateInstanceId(), zone, SceneType.Zone, name, parent);
             zoneScene.AddComponent<ZoneSceneFlagComponent>();
+
+#if  true
             zoneScene.AddComponent<NetKcpComponent, int>(SessionStreamDispatcherType.SessionStreamDispatcherClientOuter);
-			zoneScene.AddComponent<CurrentScenesComponent>();
+#else
+            zoneScene.AddComponent<NetWSComponent, int>(SessionStreamDispatcherType.SessionStreamDispatcherClientOuter);
+#endif
+
+            zoneScene.AddComponent<CurrentScenesComponent>();
             zoneScene.AddComponent<ObjectWait>();
             zoneScene.AddComponent<PlayerComponent>();
-            
-            Game.EventSystem.Publish(new EventType.AfterCreateZoneScene() {ZoneScene = zoneScene});
+
+            Game.EventSystem.Publish(new EventType.AfterCreateZoneScene() { ZoneScene = zoneScene });
             return zoneScene;
         }
-        
+
         public static Scene CreateCurrentScene(long id, int zone, string name, CurrentScenesComponent currentScenesComponent)
         {
             Scene currentScene = EntitySceneFactory.CreateScene(id, IdGenerater.Instance.GenerateInstanceId(), zone, SceneType.Current, name, currentScenesComponent);
             currentScenesComponent.Scene = currentScene;
-            
-            Game.EventSystem.Publish(new EventType.AfterCreateCurrentScene() {CurrentScene = currentScene});
+
+            Game.EventSystem.Publish(new EventType.AfterCreateCurrentScene() { CurrentScene = currentScene });
             return currentScene;
         }
-        
-        
+
+
     }
 }

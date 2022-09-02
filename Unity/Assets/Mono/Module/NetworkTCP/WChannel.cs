@@ -202,6 +202,7 @@ namespace ET
                     this.recvStream.Seek(2, SeekOrigin.Begin);
                     Array.Copy(this.cache, 0, this.recvStream.GetBuffer(), 0, receiveCount);
                     this.OnRead(this.recvStream);
+                    Console.WriteLine($"[WS] receive {receiveResult}");
                 }
             }
             catch (Exception e)
