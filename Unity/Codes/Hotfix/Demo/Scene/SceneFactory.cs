@@ -9,7 +9,7 @@ namespace ET
             Scene zoneScene = EntitySceneFactory.CreateScene(Game.IdGenerater.GenerateInstanceId(), zone, SceneType.Zone, name, parent);
             zoneScene.AddComponent<ZoneSceneFlagComponent>();
 
-#if  true
+#if !true
             zoneScene.AddComponent<NetKcpComponent, int>(SessionStreamDispatcherType.SessionStreamDispatcherClientOuter);
 #else
             zoneScene.AddComponent<NetWSComponent, int>(SessionStreamDispatcherType.SessionStreamDispatcherClientOuter);

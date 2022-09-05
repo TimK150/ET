@@ -14,12 +14,11 @@ namespace ET
                 Session session = null;
                 try
                 {
-#if  true
+#if !true
                     session = zoneScene.GetComponent<NetKcpComponent>().Create(NetworkHelper.ToIPEndPoint(address));
 #else
                     session = zoneScene.GetComponent<NetWSComponent>().Create(NetworkHelper.ToIPEndPoint(address));
 #endif
-
                     r2CLogin = (R2C_Login)await session.Call(new C2R_Login() { Account = account, Password = password });
 
                 }
@@ -27,9 +26,8 @@ namespace ET
                 {
                     session?.Dispose();
                 }
-
                 // 创建一个gate Session,并且保存到SessionComponent中
-#if  true
+#if !true
                 Session gateSession = zoneScene.GetComponent<NetKcpComponent>().Create(NetworkHelper.ToIPEndPoint(r2CLogin.Address));
 #else   
                 Session gateSession = zoneScene.GetComponent<NetWSComponent>().Create(NetworkHelper.ToIPEndPoint(r2CLogin.Address));
@@ -37,7 +35,7 @@ namespace ET
 
                 gateSession.AddComponent<PingComponent>();
                 zoneScene.AddComponent<SessionComponent>().Session = gateSession;
-
+              
                 G2C_LoginGate g2CLoginGate = (G2C_LoginGate)await gateSession.Call(
                     new C2G_LoginGate() { Key = r2CLogin.Key, GateId = r2CLogin.GateId });
 

@@ -24,7 +24,7 @@ namespace ET
             switch (scene.SceneType)
             {
                 case SceneType.Realm:
-#if  true
+#if !true
                     //Socket
                     scene.AddComponent<NetKcpComponent, IPEndPoint, int>(startSceneConfig.OuterIPPort, SessionStreamDispatcherType.SessionStreamDispatcherServerOuter);
 #else
@@ -33,7 +33,7 @@ namespace ET
 #endif
                     break;
                 case SceneType.Gate:
-#if  true
+#if !true
                     //Socket
                     scene.AddComponent<NetKcpComponent, IPEndPoint, int>(startSceneConfig.OuterIPPort, SessionStreamDispatcherType.SessionStreamDispatcherServerOuter);
 #else

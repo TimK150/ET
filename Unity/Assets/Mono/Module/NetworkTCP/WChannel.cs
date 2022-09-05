@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace ET
 {
-    public class WChannel: AChannel
+    public class WChannel : AChannel
     {
         public HttpListenerWebSocketContext WebSocketContext { get; }
 
@@ -34,8 +34,8 @@ namespace ET
             this.recvStream = new MemoryStream(ushort.MaxValue);
 
             isConnected = true;
-            
-            this.Service.ThreadSynchronizationContext.PostNext(()=>
+
+            this.Service.ThreadSynchronizationContext.PostNext(() =>
             {
                 this.StartRecv().Coroutine();
                 this.StartSend().Coroutine();
@@ -51,8 +51,8 @@ namespace ET
             this.recvStream = new MemoryStream(ushort.MaxValue);
 
             isConnected = false;
-            
-            this.Service.ThreadSynchronizationContext.PostNext(()=>this.ConnectAsync(connectUrl).Coroutine());
+
+            this.Service.ThreadSynchronizationContext.PostNext(() => this.ConnectAsync(connectUrl).Coroutine());
         }
 
         public override void Dispose()
@@ -73,9 +73,9 @@ namespace ET
         {
             try
             {
-                await ((ClientWebSocket) this.webSocket).ConnectAsync(new Uri(url), cancellationTokenSource.Token);
+                await ((ClientWebSocket)this.webSocket).ConnectAsync(new Uri(url), cancellationTokenSource.Token);
                 isConnected = true;
-                
+
                 this.StartRecv().Coroutine();
                 this.StartSend().Coroutine();
             }
@@ -88,8 +88,8 @@ namespace ET
 
         public void Send(MemoryStream stream)
         {
-            byte[] bytes = new byte[stream.Length];
-            Array.Copy(stream.GetBuffer(), bytes, bytes.Length);
+            byte[] bytes = new byte[stream.Length - stream.Position];
+            Array.Copy(stream.GetBuffer(), stream.Position, bytes, 0,  bytes.Length);
             this.queue.Enqueue(bytes);
 
             if (this.isConnected)
@@ -167,12 +167,12 @@ namespace ET
                     do
                     {
 #if NOT_UNITY
-                        receiveResult = await this.webSocket.ReceiveAsync(
+                      receiveResult = await this.webSocket.ReceiveAsync(
                             new Memory<byte>(cache, receiveCount, this.cache.Length - receiveCount),
                             cancellationTokenSource.Token);
 #else
                         receiveResult = await this.webSocket.ReceiveAsync(
-                            new ArraySegment<byte>(this.cache, receiveCount, this.cache.Length - receiveCount), 
+                            new ArraySegment<byte>(this.cache, receiveCount, this.cache.Length - receiveCount),
                             cancellationTokenSource.Token);
 #endif
                         if (this.IsDisposed)
@@ -197,7 +197,7 @@ namespace ET
                         this.OnError(ErrorCore.ERR_WebsocketMessageTooBig);
                         return;
                     }
-                    
+
                     this.recvStream.SetLength(receiveCount);
                     this.recvStream.Seek(2, SeekOrigin.Begin);
                     Array.Copy(this.cache, 0, this.recvStream.GetBuffer(), 0, receiveCount);
@@ -211,7 +211,7 @@ namespace ET
                 this.OnError(ErrorCore.ERR_WebsocketRecvError);
             }
         }
-        
+
         private void OnRead(MemoryStream memoryStream)
         {
             try
@@ -226,15 +226,15 @@ namespace ET
                 this.OnError(ErrorCore.ERR_PacketParserError);
             }
         }
-        
+
         private void OnError(int error)
         {
             Log.Debug($"WChannel error: {error} {this.RemoteAddress}");
-			
+
             long channelId = this.Id;
-			
+
             this.Service.Remove(channelId);
-			
+
             this.Service.OnError(channelId, error);
         }
     }

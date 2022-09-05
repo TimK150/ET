@@ -6,28 +6,28 @@ using System.Net.WebSockets;
 
 namespace ET
 {
-    public class WService: AService
+    public class WService : AService
     {
         private long idGenerater = 200000000;
-        
+
         private HttpListener httpListener;
-        
+
         private readonly Dictionary<long, WChannel> channels = new Dictionary<long, WChannel>();
 
         public WService(ThreadSynchronizationContext threadSynchronizationContext, IEnumerable<string> prefixs)
         {
             this.ThreadSynchronizationContext = threadSynchronizationContext;
-            
+
             this.httpListener = new HttpListener();
 
             StartAccept(prefixs).Coroutine();
         }
-        
+
         public WService(ThreadSynchronizationContext threadSynchronizationContext)
         {
             this.ThreadSynchronizationContext = threadSynchronizationContext;
         }
-        
+
         private long GetId
         {
             get
@@ -35,10 +35,10 @@ namespace ET
                 return ++this.idGenerater;
             }
         }
-        
+
         public WChannel Create(string address, long id)
         {
-			ClientWebSocket webSocket = new ClientWebSocket();
+            ClientWebSocket webSocket = new ClientWebSocket();
             WChannel channel = new WChannel(id, webSocket, address, this);
             this.channels[channel.Id] = channel;
             return channel;
@@ -84,7 +84,7 @@ namespace ET
                 {
                     this.httpListener.Prefixes.Add(prefix);
                 }
-                
+
                 httpListener.Start();
 
                 while (true)
@@ -121,10 +121,11 @@ namespace ET
                 Log.Error(e);
             }
         }
-        
+
         protected override void Get(long id, IPEndPoint address)
         {
-            throw new NotImplementedException();
+            Get(id, $"ws://{address}/");
+            //throw new NotImplementedException();
         }
 
         protected override void Send(long channelId, long actorId, MemoryStream stream)

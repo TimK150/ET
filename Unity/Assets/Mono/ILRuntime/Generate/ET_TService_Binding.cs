@@ -22,7 +22,7 @@ namespace ILRuntime.Runtime.Generated
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
             Type[] args;
-#if  true
+#if !true
             Type type = typeof(ET.TService);
 #else
             Type type = typeof(ET.WService);
@@ -52,7 +52,7 @@ namespace ILRuntime.Runtime.Generated
             ET.ThreadSynchronizationContext @threadSynchronizationContext = (ET.ThreadSynchronizationContext)typeof(ET.ThreadSynchronizationContext).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-#if  true
+#if !true
             var result_of_this_method = new ET.TService(@threadSynchronizationContext, @serviceType);
 #else
             var result_of_this_method = new ET.WService(@threadSynchronizationContext/*, @serviceType*/);
@@ -78,7 +78,7 @@ namespace ILRuntime.Runtime.Generated
             ET.ThreadSynchronizationContext @threadSynchronizationContext = (ET.ThreadSynchronizationContext)typeof(ET.ThreadSynchronizationContext).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
-#if  true
+#if !true
             var result_of_this_method = new ET.TService(@threadSynchronizationContext, @ipEndPoint, @serviceType);
 #else
             var result_of_this_method = new ET.WService(@threadSynchronizationContext/*, @ipEndPoint, @serviceType*/);

@@ -10,11 +10,22 @@ namespace ET
     {
         public void Dispatch(Session session, MemoryStream memoryStream)
         {
-            var ms = Encoding.ASCII.GetString(memoryStream.ToArray());
-           
-            ushort opcode = BitConverter.ToUInt16(memoryStream.GetBuffer(), Packet.KcpOpcodeIndex);
+            // input
+            var input = Encoding.ASCII.GetString(memoryStream.ToArray());
+            
+            MemoryStream ms = new MemoryStream();
+            foreach (var item in memoryStream.GetBuffer())
+            {
+                if (item != 0)
+                    ms.WriteByte(item);
+            }
+            ms.Capacity = Convert.ToInt32(ms.Length);
+            ms.Position = 2;
+
+            // ms for ws
+            ushort opcode = BitConverter.ToUInt16(ms.GetBuffer(), Packet.KcpOpcodeIndex);
             Type type = OpcodeTypeComponent.Instance.GetType(opcode);
-            object message = MessageSerializeHelper.DeserializeFrom(opcode, type, memoryStream);
+            object message = MessageSerializeHelper.DeserializeFrom(opcode, type, ms);
 
             if (message is IResponse response)
             {
