@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.WebSockets;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ET
 {
@@ -32,11 +34,11 @@ namespace ET
             this.WebSocketContext = webSocketContext;
             this.webSocket = webSocketContext.WebSocket;
             this.recvStream = new MemoryStream(ushort.MaxValue);
-
             isConnected = true;
 
             this.Service.ThreadSynchronizationContext.PostNext(() =>
             {
+                this.cancellationTokenSource = new CancellationTokenSource();
                 this.StartRecv().Coroutine();
                 this.StartSend().Coroutine();
             });
@@ -156,58 +158,30 @@ namespace ET
 
             try
             {
-                while (true)
+                while (webSocket.State==WebSocketState.Open)
                 {
                     //#if NOT_UNITY
                     //                    ValueWebSocketReceiveResult receiveResult;
                     //#else
-                    WebSocketReceiveResult receiveResult;
-                    //#endif
-                    int receiveCount = 0;
-                    do
-                    {
-                        //#if NOT_UNITY
-                        //                      receiveResult = await this.webSocket.ReceiveAsync(
-                        //                            new Memory<byte>(cache, receiveCount, this.cache.Length - receiveCount),
-                        //                            cancellationTokenSource.Token);
-                        //#else
-                        receiveResult = await this.webSocket.ReceiveAsync(
-                            new ArraySegment<byte>(this.cache, receiveCount, this.cache.Length - receiveCount),
-                            cancellationTokenSource.Token);
-                        //#endif
-                        if (this.IsDisposed)
-                        {
-                            return;
-                        }
-
-                        receiveCount += receiveResult.Count;
-                    }
-                    while (!receiveResult.EndOfMessage);
-
-                    if (receiveResult.MessageType == WebSocketMessageType.Close)
-                    {
-                        this.OnError(ErrorCore.ERR_WebsocketPeerReset);
-                        return;
-                    }
-
-                    if (receiveResult.Count > ushort.MaxValue)
-                    {
-                        await this.webSocket.CloseAsync(WebSocketCloseStatus.MessageTooBig, $"message too big: {receiveCount}",
-                            cancellationTokenSource.Token);
-                        this.OnError(ErrorCore.ERR_WebsocketMessageTooBig);
-                        return;
-                    }
-
-                    this.recvStream.SetLength(receiveCount);
-                    this.recvStream.Seek(2, SeekOrigin.Begin);
-                    Array.Copy(this.cache, 0, this.recvStream.GetBuffer(), 0, receiveCount);
-                    this.OnRead(this.recvStream);
+                    byte[] returnBytes = new byte[10240];
+                    WebSocketReceiveResult webSocketReceiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(returnBytes), CancellationToken.None);
+                    string ReceivesData = Encoding.UTF8.GetString(returnBytes, 0, webSocketReceiveResult.Count);
+                    ReceivesData = $"我已经收到数据：{ReceivesData}";
+                    Console.WriteLine(ReceivesData);
+                    returnBytes = Encoding.UTF8.GetBytes(ReceivesData);
+                    await webSocket.SendAsync(new ArraySegment<byte>(returnBytes), WebSocketMessageType.Text, true, CancellationToken.None);
+                    await Task.Delay(TimeSpan.FromSeconds(3));
                 }
             }
             catch (Exception e)
             {
                 Log.Error(e);
                 this.OnError(ErrorCore.ERR_WebsocketRecvError);
+            }
+            finally
+            {
+                if (webSocket.State == WebSocketState.Closed)
+                    this.Dispose();
             }
         }
 
