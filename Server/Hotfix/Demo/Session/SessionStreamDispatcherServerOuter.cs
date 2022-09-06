@@ -12,7 +12,8 @@ namespace ET
         {
             // input
             var input = Encoding.ASCII.GetString(memoryStream.ToArray());
-            
+            Console.WriteLine($"[WS] input: {input}");
+
             MemoryStream ms = new MemoryStream();
             foreach (var item in memoryStream.GetBuffer())
             {

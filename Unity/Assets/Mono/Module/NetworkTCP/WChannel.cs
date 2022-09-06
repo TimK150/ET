@@ -158,23 +158,23 @@ namespace ET
             {
                 while (true)
                 {
-#if NOT_UNITY
-                    ValueWebSocketReceiveResult receiveResult;
-#else
+//#if NOT_UNITY
+//                    ValueWebSocketReceiveResult receiveResult;
+//#else
                     WebSocketReceiveResult receiveResult;
-#endif
+//#endif
                     int receiveCount = 0;
                     do
                     {
-#if NOT_UNITY
-                      receiveResult = await this.webSocket.ReceiveAsync(
-                            new Memory<byte>(cache, receiveCount, this.cache.Length - receiveCount),
-                            cancellationTokenSource.Token);
-#else
+//#if NOT_UNITY
+//                      receiveResult = await this.webSocket.ReceiveAsync(
+//                            new Memory<byte>(cache, receiveCount, this.cache.Length - receiveCount),
+//                            cancellationTokenSource.Token);
+//#else
                         receiveResult = await this.webSocket.ReceiveAsync(
                             new ArraySegment<byte>(this.cache, receiveCount, this.cache.Length - receiveCount),
                             cancellationTokenSource.Token);
-#endif
+//#endif
                         if (this.IsDisposed)
                         {
                             return;
