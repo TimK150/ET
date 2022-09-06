@@ -15,7 +15,7 @@ namespace ET
             NetInnerComponent.Instance = self;
             self.SessionStreamDispatcherType = sessionStreamDispatcherType;
 
-#if  true
+#if !true
             self.Service = new TService(NetThreadComponent.Instance.ThreadSynchronizationContext, ServiceType.Inner);
 #else
             self.Service = new WService(NetThreadComponent.Instance.ThreadSynchronizationContext/*, ServiceType.Inner*/);
@@ -37,7 +37,7 @@ namespace ET
             self.SessionStreamDispatcherType = sessionStreamDispatcherType;
 
             Console.WriteLine($"{this.GetType().ToString()}_address: {address}");
-#if  true
+#if !true
             self.Service = new TService(NetThreadComponent.Instance.ThreadSynchronizationContext, address, ServiceType.Inner);
 #else
             self.Service = new WService(NetThreadComponent.Instance.ThreadSynchronizationContext, new List<string> { $"http://127.0.0.1:20001/" } /*, address, ServiceType.Inner*/);

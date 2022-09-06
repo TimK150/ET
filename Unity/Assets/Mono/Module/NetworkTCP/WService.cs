@@ -54,6 +54,8 @@ namespace ET
 
             this.channels.Remove(id);
             channel.Dispose();
+
+            Console.WriteLine($"WS is disconnected");
         }
 
         public override bool IsDispose()
@@ -96,6 +98,8 @@ namespace ET
                         HttpListenerWebSocketContext webSocketContext = await httpListenerContext.AcceptWebSocketAsync(null);
 
                         WChannel channel = new WChannel(this.GetId, webSocketContext, this);
+
+                        Console.WriteLine($"WS is connected");
 
                         this.channels[channel.Id] = channel;
 
