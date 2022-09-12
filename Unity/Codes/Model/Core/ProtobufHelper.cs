@@ -39,17 +39,20 @@ namespace ET
 
         public static void ToStream(object message, MemoryStream stream)
         {
+            Console.WriteLine($"[Encode] message:{message}");
             ProtoBuf.Serializer.Serialize(stream, message);
         }
 
         public static object FromStream(Type type, MemoryStream stream)
-        {
+        {            
 	        object o = RuntimeTypeModel.Default.Deserialize(stream, null, type);
 	        if (o is ISupportInitialize supportInitialize)
 	        {
 		        supportInitialize.EndInit();
 	        }
-	        return o;
+
+			Console.WriteLine($"[Decode] message FromStream:{o}");
+			return o;
         }
     }
 }

@@ -81,6 +81,9 @@ namespace ET
 			{
 				long id = this.CreateAcceptChannelId(0);
 				TChannel channel = new TChannel(id, acceptSocket, this);
+
+				Console.WriteLine($"Socket is connected, channel id:{channel.Id}, channel RemoteAddress:{channel.RemoteAddress}");
+
 				this.idChannels.Add(channel.Id, channel);
 				long channelId = channel.Id;
 				
@@ -153,6 +156,8 @@ namespace ET
 			}
 
 			this.idChannels.Remove(id);
+
+			Console.WriteLine($"Socket is disconnected, channel id:{id}, channel RemoteAddress:{channel?.RemoteAddress.ToString() ?? ""}");
 		}
 
 		protected override void Send(long channelId, long actorId, MemoryStream stream)
@@ -164,7 +169,7 @@ namespace ET
 				{
 					this.OnError(channelId, ErrorCore.ERR_SendMessageNotFoundTChannel);
 					return;
-				}
+				} 
 				aChannel.Send(actorId, stream);
 			}
 			catch (Exception e)

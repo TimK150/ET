@@ -17,10 +17,11 @@ namespace ET
 #if !true
                     session = zoneScene.GetComponent<NetKcpComponent>().Create(NetworkHelper.ToIPEndPoint(address));
 #else
+                    Log.Debug("AAAAAAAAAAAAAAA");
                     session = zoneScene.GetComponent<NetWSComponent>().Create(NetworkHelper.ToIPEndPoint(address));
 #endif
                     r2CLogin = (R2C_Login)await session.Call(new C2R_Login() { Account = account, Password = password });
-
+                    Log.Debug("BBBBBBBBBBBBBB");
                 }
                 finally
                 {
@@ -29,13 +30,15 @@ namespace ET
                 // 创建一个gate Session,并且保存到SessionComponent中
 #if !true
                 Session gateSession = zoneScene.GetComponent<NetKcpComponent>().Create(NetworkHelper.ToIPEndPoint(r2CLogin.Address));
-#else   
+#else
                 Session gateSession = zoneScene.GetComponent<NetWSComponent>().Create(NetworkHelper.ToIPEndPoint(r2CLogin.Address));
 #endif
+                Log.Debug("CCCCCCCCCCCCCCC");
 
                 gateSession.AddComponent<PingComponent>();
                 zoneScene.AddComponent<SessionComponent>().Session = gateSession;
-              
+
+                Log.Debug("DDDDDDDDDDDDDDD");
                 G2C_LoginGate g2CLoginGate = (G2C_LoginGate)await gateSession.Call(
                     new C2G_LoginGate() { Key = r2CLogin.Key, GateId = r2CLogin.GateId });
 

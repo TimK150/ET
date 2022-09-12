@@ -14,12 +14,7 @@ namespace ET
         {
             NetInnerComponent.Instance = self;
             self.SessionStreamDispatcherType = sessionStreamDispatcherType;
-
-#if !true
             self.Service = new TService(NetThreadComponent.Instance.ThreadSynchronizationContext, ServiceType.Inner);
-#else
-            self.Service = new WService(NetThreadComponent.Instance.ThreadSynchronizationContext/*, ServiceType.Inner*/);
-#endif
             self.Service.ErrorCallback += self.OnError;
             self.Service.ReadCallback += self.OnRead;
 
@@ -37,11 +32,7 @@ namespace ET
             self.SessionStreamDispatcherType = sessionStreamDispatcherType;
 
             Console.WriteLine($"{this.GetType().ToString()}_address: {address}");
-#if !true
             self.Service = new TService(NetThreadComponent.Instance.ThreadSynchronizationContext, address, ServiceType.Inner);
-#else
-            self.Service = new WService(NetThreadComponent.Instance.ThreadSynchronizationContext, new List<string> { $"http://127.0.0.1:20001/" } /*, address, ServiceType.Inner*/);
-#endif
             self.Service.ErrorCallback += self.OnError;
             self.Service.ReadCallback += self.OnRead;
             self.Service.AcceptCallback += self.OnAccept;

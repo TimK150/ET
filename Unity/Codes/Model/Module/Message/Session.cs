@@ -126,6 +126,7 @@ namespace ET
 
         public static void Send(this Session self, IMessage message)
         {
+            Log.Debug($"[Message] {message}");
             self.Send(0, message);
         }
         
