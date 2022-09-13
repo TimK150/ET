@@ -29,6 +29,8 @@ namespace ET
 
         private readonly CircularBuffer sendBuffer = new CircularBuffer();
 
+        public const int OuterPacketSizeLength = 2;
+
         public WChannel(long id, HttpListenerWebSocketContext webSocketContext, WService service)
         {
             this.Id = id;
@@ -93,22 +95,13 @@ namespace ET
 
         public void Send(MemoryStream stream)
         {
-            byte[] bytes = new byte[stream.Length - stream.Position];
-            Array.Copy(stream.GetBuffer(), stream.Position, bytes, 0, bytes.Length);
+            stream.Seek(Packet.ActorIdLength, SeekOrigin.Begin);
+            ushort messageSize = (ushort)(stream.Length - stream.Position);
+            this.sendCache.WriteTo(0, messageSize);
+            this.sendBuffer.Write(this.sendCache, 0, PacketParser.OuterPacketSizeLength);
+            this.sendBuffer.Write(stream.GetBuffer(), (int)stream.Position, (int)(stream.Length - stream.Position));
 
-            //stream.Seek(Packet.ActorIdLength, SeekOrigin.Begin); // 外网不需要actorId
-
-            //ushort messageSize = (ushort)(stream.Length - stream.Position);
-            //this.sendCache.WriteTo(0, messageSize);
-            //this.sendBuffer.Write(this.sendCache, 0, PacketParser.OuterPacketSizeLength);
-            //this.sendBuffer.Write(stream.GetBuffer(), (int)stream.Position, (int)(stream.Length - stream.Position));
-
-            //byte[] bytes = new byte[sendBuffer.Length];
-
-            ////Array.Copy(stream.GetBuffer(), stream.Position, bytes, PacketParser.OuterPacketSizeLength, bytes.Length - PacketParser.OuterPacketSizeLength);
-            //Array.Copy(sendBuffer.Last, sendBuffer.Position, bytes, 0, bytes.Length);
-
-            this.queue.Enqueue(bytes);
+            this.queue.Enqueue(sendBuffer.Last);
 
             if (this.isConnected)
             {
@@ -143,25 +136,8 @@ namespace ET
                     byte[] bytes = this.queue.Dequeue();
                     try
                     {
-                        //await this.webSocket.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), WebSocketMessageType.Binary, true, cancellationTokenSource.Token);
+                        await this.webSocket.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length), WebSocketMessageType.Binary, true, cancellationTokenSource.Token);
 
-                        // ms
-                        int c = 0;
-                        foreach (var b in bytes)
-                        {
-                            if (b != 0)
-                            {
-                                c++;
-                            }
-                        }
-                        byte[] bs = new byte[c];
-                        for (int i = 8; i < bytes.Length; i++)
-                        {
-                            bs[i - 8] = bytes[i];
-                        }
-
-                        await this.webSocket.SendAsync(new ArraySegment<byte>(bs, 0, bs.Length), WebSocketMessageType.Binary, true, cancellationTokenSource.Token);
-                        System.Threading.Thread.Sleep(1000);
                         if (this.IsDisposed)
                         {
                             return;
@@ -234,11 +210,12 @@ namespace ET
                         return;
                     }
 
-                    this.recvStream.SetLength(receiveCount);
-                    this.recvStream.Seek(2, SeekOrigin.Begin);
-                    Array.Copy(this.cache, 0, this.recvStream.GetBuffer(), 0, receiveCount);
-                    Console.WriteLine($"recvStream.Length:{recvStream.Length}");
-                    this.OnRead(this.recvStream);
+                    int size = BitConverter.ToUInt16(this.cache, 0);
+                    MemoryStream memoryStream = new MemoryStream(size);
+                    memoryStream.SetLength(size);
+                    Array.Copy(this.cache, Packet.OpcodeLength, memoryStream.GetBuffer(), 0, size);
+                    memoryStream.Seek(Packet.OpcodeLength, SeekOrigin.Begin);
+                    this.OnRead(memoryStream);
                 }
             }
             catch (Exception e)

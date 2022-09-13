@@ -9,24 +9,10 @@ namespace ET
     public class SessionStreamDispatcherServerOuter : ISessionStreamDispatcher
     {
         public void Dispatch(Session session, MemoryStream memoryStream)
-        {
-            // input
-            var input = Encoding.ASCII.GetString(memoryStream.ToArray());
-            Console.WriteLine($"[WS] input: {input}");
-
-            MemoryStream ms = new MemoryStream();
-            foreach (var item in memoryStream.GetBuffer())
-            {
-                if (item != 0)
-                    ms.WriteByte(item);
-            }
-            ms.Capacity = Convert.ToInt32(ms.Length);
-            ms.Position = 2;
-
-            // ms for ws
-            ushort opcode = BitConverter.ToUInt16(ms.GetBuffer(), Packet.KcpOpcodeIndex);
+        {      
+            ushort opcode = BitConverter.ToUInt16(memoryStream.GetBuffer(), Packet.KcpOpcodeIndex);
             Type type = OpcodeTypeComponent.Instance.GetType(opcode);
-            object message = MessageSerializeHelper.DeserializeFrom(opcode, type, ms);
+            object message = MessageSerializeHelper.DeserializeFrom(opcode, type, memoryStream);
 
             if (message is IResponse response)
             {
