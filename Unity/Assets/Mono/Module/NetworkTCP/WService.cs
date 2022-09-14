@@ -99,7 +99,7 @@ namespace ET
 
                         WChannel channel = new WChannel(this.GetId, webSocketContext, this);
 
-                        Console.WriteLine($"WS is connected, channel Id: {channel.Id}, channel RemoteAddress:{channel.RemoteAddress}");
+                        Console.WriteLine($"WS is connected, channel Id: {channel.Id}, RequestUri:{webSocketContext.RequestUri}");
 
                         this.channels[channel.Id] = channel;
 
